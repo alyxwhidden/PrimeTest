@@ -10,6 +10,7 @@ namespace PrimeTest2
     {
         static void Main(string[] args)
         {
+            //Multithread Branch
             List<int> primes = new List<int> { 1 };
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
