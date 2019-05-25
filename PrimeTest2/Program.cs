@@ -12,7 +12,7 @@ namespace PrimeTest2
 
         static public Dictionary<int, List<int>> newPrimes = new Dictionary<int, List<int>>();
 
-        static public int THREAD_LIMIT = 4;
+        static public int THREAD_LIMIT = 8;
 
         static public void primesInRangeThread(int rangeIndex, int start, int end)
         {
@@ -51,7 +51,7 @@ namespace PrimeTest2
             
             var watch = System.Diagnostics.Stopwatch.StartNew();            
 
-            int primesUpTo = 10000000;
+            int primesUpTo = int.MaxValue - 2;
             int lastPrimeCheck = 2;
             double sum = 0;
 
@@ -93,9 +93,12 @@ namespace PrimeTest2
                     thread.Join();
                 }
                 
-                for(int key = 0; key < newPrimes.Keys.Count(); key++)
-                {  
-                    primes.AddRange(newPrimes[key]);
+                for(int key = 0; key < rangeCount; key++)
+                {
+                    if (newPrimes.ContainsKey(key))
+                    {
+                        primes.AddRange(newPrimes[key]);
+                    }
                 }
 
                 newPrimes.Clear();
