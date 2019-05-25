@@ -13,9 +13,6 @@ namespace PrimeTest2
             List<int> primes = new List<int> { 1 };
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            // the code that you want to measure comes here
-            
-
             int increment = 1;
             int primesUpTo = 10000000;
             double sum = 0;
@@ -44,11 +41,14 @@ namespace PrimeTest2
                 {
                     primes.Add(i);
                     sum += i;
-                    Console.WriteLine(i);
                 }
             }
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
+            foreach(int prime in primes)
+            {
+                Console.WriteLine(prime);
+            }
             Console.WriteLine($"Number of primes from 1 to {primesUpTo}: {primes.Count()}");
             Console.WriteLine($"Sum of primes from 1 to {primesUpTo}: {sum}");
             Console.WriteLine($"Time to completion: {elapsedMs}ms");
