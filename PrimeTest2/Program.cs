@@ -12,7 +12,7 @@ namespace PrimeTest2
 
         static public Dictionary<int, List<int>> newPrimes = new Dictionary<int, List<int>>();
 
-        static public int THREAD_LIMIT = 8;
+        static public int THREAD_LIMIT = Environment.ProcessorCount;
 
         static public void primesInRangeThread(int rangeIndex, int start, int end)
         {
