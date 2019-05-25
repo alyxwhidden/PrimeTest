@@ -40,14 +40,13 @@ namespace PrimeTest2
                 if (isPrime)
                 {
                     primes.Add(i);
-                    sum += i;
                 }
             }
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
             foreach(int prime in primes)
             {
-                Console.WriteLine(prime);
+                sum += prime;
             }
             Console.WriteLine($"Number of primes from 1 to {primesUpTo}: {primes.Count()}");
             Console.WriteLine($"Sum of primes from 1 to {primesUpTo}: {sum}");
