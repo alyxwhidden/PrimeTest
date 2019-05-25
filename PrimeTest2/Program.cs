@@ -2,31 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace PrimeTest2
 {
     class Program
     {
-        static void Main(string[] args)
+        static public List<int> primes = new List<int> { 1, 2 };
+
+        static public Dictionary<int, List<int>> newPrimes = new Dictionary<int, List<int>>();
+
+        static public Dictionary<int, int> newPrimeSums = new Dictionary<int, int>();
+
+        static public int THREAD_LIMIT = 4;
+
+        static public void primesInRangeThread(int rangeIndex, int start, int end)
         {
-            //Multithread Branch
-            List<int> primes = new List<int> { 1 };
-
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            // the code that you want to measure comes here
-            
-
-            int increment = 1;
-            int primesUpTo = 10000000;
-            double sum = 0;
-
-            for (int i = 2; i <= primesUpTo; i += increment)
+            List<int> primesInRange = new List<int>();
+            if(start % 2 == 0)
             {
-                double limit = Math.Sqrt(i);
+                start += 1;
+            }
+            int sum = 0;
+            for (int i = start; i <= end; i+=2)
+            {
                 int primeIndex = 1;
                 bool isPrime = true;
-                while (primeIndex < primes.Count() && primes[primeIndex] <= limit)
+                double limit = Math.Sqrt(i);
+                while(primeIndex < primes.Count() && primes[primeIndex] <= limit)
                 {
                     if (i % primes[primeIndex] == 0)
                     {
@@ -36,20 +39,90 @@ namespace PrimeTest2
                     primeIndex++;
                 }
 
-                if(i > 2)
-                {
-                    increment = 2;
-                }
-
                 if (isPrime)
                 {
-                    primes.Add(i);
+                    primesInRange.Add(i);
                     sum += i;
-                    Console.WriteLine(i);
+                }
+            }
+
+            newPrimes.Add(rangeIndex, primesInRange);
+            newPrimeSums.Add(rangeIndex, sum);
+        }
+
+        static void Main(string[] args)
+        {
+            //Multithread Branch
+            
+            var watch = System.Diagnostics.Stopwatch.StartNew();            
+
+            int primesUpTo = 10000000;
+            int lastPrimeCheck = 2;
+            double sum = 0;
+
+            for (int primeIndex = 1; primeIndex < primes.Count(); primeIndex++)
+            {
+                double limit = Math.Pow(primes[primeIndex], 2) - 1;
+                if(limit > primesUpTo)
+                {
+                    limit = primesUpTo;
+                }
+
+                List<List<int>> primeRanges = new List<List<int>>();
+
+                int valuesToCheck = (int)limit - lastPrimeCheck;
+                int rangeCount = (valuesToCheck < THREAD_LIMIT) ? valuesToCheck : THREAD_LIMIT;
+                int valuesPerRange = valuesToCheck / rangeCount;
+                for(int i = 0; i < rangeCount; i++)
+                {
+                    int start = lastPrimeCheck + 1 + i * (valuesToCheck / rangeCount);
+                    int end = (i == (rangeCount - 1)) ? (int)limit : (start + valuesPerRange - 1);
+                    primeRanges.Add(new List<int>() { start, end });
+                }
+
+                List<Thread> threads = new List<Thread>();
+                
+                for(int primeRangeIndex = 0; primeRangeIndex < primeRanges.Count(); primeRangeIndex++)
+                {
+                    int tempIndex = primeRangeIndex;
+                    List<int> range = primeRanges[tempIndex];
+                    int start = range[0];
+                    int end = range[1];
+                    Thread tempThread = new Thread(() => primesInRangeThread(tempIndex, start, end));
+                    threads.Add(tempThread);
+                    tempThread.Start();
+                }
+
+                foreach(Thread thread in threads)
+                {
+                    thread.Join();
+                }
+                
+                for(int key = 0; key < newPrimes.Keys.Count(); key++)
+                {  
+                    primes.AddRange(newPrimes[key]);
+                }
+
+                for (int key = 0; key < newPrimeSums.Keys.Count(); key++)
+                {
+                    sum += newPrimeSums[key];
+                }
+
+                newPrimes.Clear();
+                newPrimeSums.Clear();
+                lastPrimeCheck = (int)limit;
+
+                if(limit == primesUpTo)
+                {
+                    break;
                 }
             }
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
+            foreach (int prime in primes)
+            {
+                Console.WriteLine(prime);
+            }
             Console.WriteLine($"Number of primes from 1 to {primesUpTo}: {primes.Count()}");
             Console.WriteLine($"Sum of primes from 1 to {primesUpTo}: {sum}");
             Console.WriteLine($"Time to completion: {elapsedMs}ms");
