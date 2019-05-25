@@ -12,8 +12,6 @@ namespace PrimeTest2
 
         static public Dictionary<int, List<int>> newPrimes = new Dictionary<int, List<int>>();
 
-        static public Dictionary<int, int> newPrimeSums = new Dictionary<int, int>();
-
         static public int THREAD_LIMIT = 4;
 
         static public void primesInRangeThread(int rangeIndex, int start, int end)
@@ -23,7 +21,6 @@ namespace PrimeTest2
             {
                 start += 1;
             }
-            int sum = 0;
             for (int i = start; i <= end; i+=2)
             {
                 int primeIndex = 1;
@@ -42,12 +39,10 @@ namespace PrimeTest2
                 if (isPrime)
                 {
                     primesInRange.Add(i);
-                    sum += i;
                 }
             }
 
             newPrimes.Add(rangeIndex, primesInRange);
-            newPrimeSums.Add(rangeIndex, sum);
         }
 
         static void Main(string[] args)
@@ -103,13 +98,7 @@ namespace PrimeTest2
                     primes.AddRange(newPrimes[key]);
                 }
 
-                for (int key = 0; key < newPrimeSums.Keys.Count(); key++)
-                {
-                    sum += newPrimeSums[key];
-                }
-
                 newPrimes.Clear();
-                newPrimeSums.Clear();
                 lastPrimeCheck = (int)limit;
 
                 if(limit == primesUpTo)
@@ -121,7 +110,7 @@ namespace PrimeTest2
             var elapsedMs = watch.ElapsedMilliseconds;
             foreach (int prime in primes)
             {
-                Console.WriteLine(prime);
+                sum += prime;
             }
             Console.WriteLine($"Number of primes from 1 to {primesUpTo}: {primes.Count()}");
             Console.WriteLine($"Sum of primes from 1 to {primesUpTo}: {sum}");
