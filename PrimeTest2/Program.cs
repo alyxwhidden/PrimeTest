@@ -66,10 +66,12 @@ namespace PrimeTest2
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
             //Ceiling for primes
-            int primesUpTo = 10000000;
+            int primesUpTo = 1000000000;
 
             //Last int checked for primality
             int lastPrimeCheck = 2;
+
+            int lastPercentUpdate = 0;
 
             //For each prime in primes other than 1
             for (int primeIndex = 1; primeIndex < primes.Count(); primeIndex++)
@@ -135,7 +137,17 @@ namespace PrimeTest2
                 //Break from the loop if we've reached our ceiling
                 if(limit == primesUpTo)
                 {
+                    Console.WriteLine("Progress: 100%");
                     break;
+                }
+                else
+                {
+                    int percent = (int) ((double)primes[primeIndex] / Math.Sqrt(primesUpTo) * 100);
+                    if(percent != lastPercentUpdate)
+                    {
+                        Console.WriteLine($"Progress: {percent}%, {primes.Count()} primes found");
+                        lastPercentUpdate = percent;
+                    }
                 }
 
                 //Update last prime checked to limit
